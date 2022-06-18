@@ -9,46 +9,13 @@
 
 </head>
 
-<body>
+<body style="background-image: url(https://source.unsplash.com/1376x768/?gardening,cooking,shopping) ;">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Navbar</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Dropdown
-                </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="#">Action</a></li>
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled">Disabled</a>
-                    </li>
-                </ul>
-                <form class="d-flex" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
-            </div>
+            <a class="navbar-brand" href="#">TODO List</a>
         </div>
     </nav>
-    <div class="container my-4">
+    <div class="container my-4" style="background-color: white;">
 
         <h3 class="text-center">TODO List</h1>
 
@@ -64,7 +31,7 @@
             </div>
 
             <button type="submit" id="add" class="btn btn-primary">Add to list</button>
-            <button type="submit" class="btn btn-primary">Clear List</button>
+            <button id="clear" class="btn btn-primary" onclick="clearStorage()">Clear List</button>
 
             <br><br>
 
@@ -95,9 +62,7 @@
     </div>
 
     <script>
-        add = document.getElementById('add');
-        add.addEventListener('click', () => {
-
+        function setAndUpdate() {
             console.log('Updating...');
             tit = document.getElementById('title').value;
             desc = document.getElementById('description').value;
@@ -114,32 +79,60 @@
                 itemsJsonArray.push([tit, desc]);
                 localStorage.setItem('itemsJson', JSON.stringify(itemsJsonArray))
             }
+            update();
+        }
 
-            //Displaying input on the table
-            tableBody = document.getElementById('tableBody')
-            itemsJsonArray.foreach(element, index) {
-                let str = "";
-                str += ' <
-                tr >
-                    <
-                    th scope = "row" > $ {
-                        index + 1
-                    } < /th> <
-                td > $ {
-                    element[0]
-                } < /td> <
-                td > $ {
-                    element[1]
-                } < /td> <
-                td > < button class = "btn btn-sm btn-primary" > Delete < /button></td >
-                    <
-                    /tr>
+        function update() {
 
-                '
+            if (localStorage.getItem("itemsJson") == null) {
+
+                itemsJsonArray = [];
+                localStorage.setItem('itemsJson', JSON.stringify(itemsJsonArray))
+            } else {
+                // IF local storage is not empty
+                itemsJsonArrayStr = localStorage.getItem('itemsJson')
+                itemsJsonArray = JSON.parse(itemsJsonArrayStr)
             }
 
+            //Displaying input on the table
+            let tableBody = document.getElementById('tableBody');
+            let str = "";
+            itemsJsonArray.forEach((element, index) => {
+                str += `
+                <tr>
+                            <th scope="row">${index+1}</th>
+                            <td>${element[0]}</td>
+                            <td>${element[1]}</td>
+                            <td><button class="btn btn-sm btn-primary" onClick="deleteitem(${index})")>Delete</button></td>
+                        </tr>
+                `
+            });
 
-        });
+            tableBody.innerHTML = str;
+        }
+        add = document.getElementById('add');
+        add.addEventListener('click', setAndUpdate);
+        update();
+
+        function deleteitem(itemIndex) {
+            console.log("deleting...", itemIndex)
+            itemsJsonArrayStr = localStorage.getItem('itemsJson')
+            itemsJsonArray = JSON.parse(itemsJsonArrayStr)
+                //Deleting the element
+            itemsJsonArray.splice(itemIndex, 1);
+            localStorage.setItem('itemsJson', JSON.stringify(itemsJsonArray))
+            update();
+
+        }
+
+        function clearStorage() {
+            if (confirm("Do you really want to clear list?")) {
+
+                localStorage.clear()
+                console.log("Clearing...")
+                update();
+            }
+        }
     </script>
 
 
